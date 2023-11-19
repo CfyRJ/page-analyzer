@@ -1,0 +1,32 @@
+[tool.poetry]
+name = "hexlet-code"
+version = "0.1.0"
+description = "Page Analyzer is a site that analyzes the security of pages to determine their suitability for SEO, similar to PageSpeed Insights."
+authors = ["Alexandr Kositskiy <koso-96@mail.ru>"]
+readme = "README.md"
+repository = "https://github.com/CfyRJ/python-project-83"
+classifiers = [
+    "Development Status :: 1 - Planning",
+    "Intended Audience :: Other Audience",
+    "License :: Aladdin Free Public License (AFPL)",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3 :: Only",
+]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+[tool.poetry.scripts]
+page_analyzer = ""
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.3"
+flake8 = "^6.1.0"
+flask = "^3.0.0"
+gunicorn = "^21.2.0"
+pytest-cov = "^4.1.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
