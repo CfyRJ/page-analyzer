@@ -1,5 +1,14 @@
-from page_analyzer.app import index
+import pytest
+
+from page_analyzer.app import app
 
 
-def test_index():
-    assert True
+@pytest.fixture
+def client():
+    return app.test_client()
+
+
+def test_index(client):
+    response = client.get('/')
+    print(response.data)
+    assert bytes('Анализатор страниц', encoding='utf-8') in response.data
