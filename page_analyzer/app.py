@@ -41,7 +41,11 @@ def add_url():
             input_url=url,
             messages=messages,
         ), 422
-    elif TableUrls.check_url(url):
+
+    url = urlparse(url)
+    url = f'{url.scheme}://{url.netloc}'
+
+    if TableUrls.check_url(url):
         id = TableUrls.select_id(url)
         flash('URL существует', 'error')
     else:
@@ -80,4 +84,4 @@ def show_url(id):
 def checks(id):
     id = 0
 
-    return redirect(url_for('show_url', id = id), 302)
+    return redirect(url_for('show_url', id=id), 302)
