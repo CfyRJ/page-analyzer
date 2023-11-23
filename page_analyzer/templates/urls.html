@@ -31,9 +31,9 @@
               {% for url in urls %}
                 <tr>
                   <td>{{ url.id }}</td>
-                  <td><a href="{{  url_for('url', id = url.id) }}"></a>{{ url.name }}</td>
-                  <td>{{ url.check.created_at }}</td>
-                  <td>{{ url.check.code }}</td>
+                  <td><a href="{{  url_for('show_url', id = url.id) }}"></a>{{ url.name }}</td>
+                  <td>url.check.created_at</td>
+                  <td>url.check.code</td>
                 </tr>
               {% endfor %}
             </tbody>
