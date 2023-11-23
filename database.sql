@@ -1,9 +1,9 @@
-CREATE TABLE table_urls (
+CREATE TABLE IF NOT EXISTS table_urls (
     id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     name varchar(255),
     created_at timestamp
 );
-CREATE TABLE url_checks (
+CREATE TABLE IF NOT EXISTS url_checks (
     id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     url_id bigint REFERENCES table_urls (id),
     status_code integer,
