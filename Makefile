@@ -1,9 +1,6 @@
 install:
 	poetry install
 
-build:
-	poetry build
-
 publish:
 	poetry publish --dry-run
 
@@ -32,3 +29,6 @@ pytest:
 
 test-coverage:
 	poetry run pytest --cov=page_analyzer --cov-report xml
+
+build:
+    ./build.sh
