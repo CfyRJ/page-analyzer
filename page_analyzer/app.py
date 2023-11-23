@@ -5,28 +5,13 @@ from flask import url_for
 from flask import flash, get_flashed_messages
 
 import validators
-import psycopg2
-import os
-import datetime
-from dotenv import load_dotenv
 from urllib.parse import urlparse
+
+from page_analyzer.database_queries import TableUrls
 
 
 app = Flask(__name__)
 app.secret_key = "secret_key"
-
-load_dotenv()
-DATABASE_URL = os.getenv('DATABASE_URL')
-
-
-def execute_query(connect, query):
-    cursor = connect.cursor()
-    try:
-        cursor.execute(query)
-        connect.commit()
-        print("Success!")
-    except:
-        print("Error")
 
 
 @app.route('/')
@@ -44,11 +29,11 @@ def add_url():
     url = request.form.get('url')
 
     if not validators.url(url):
-        if url == '':
-            flash('URL обязателен', 'error')
-        else:
-            flash('Некорректный URL', 'error')
+        message = 'URL обязателен' \
+            if url == '' \
+            else 'Некорректный URL'
 
+        flash(message, 'error')
         messages = get_flashed_messages(with_categories=True)
 
         return render_template(
@@ -56,40 +41,19 @@ def add_url():
             input_url=url,
             messages=messages,
         ), 422
+    elif TableUrls.check_url(url):
+        id = TableUrls.select_id(url)
+        flash('URL существует', 'error')
+    else:
+        TableUrls.insert(url)
 
-    url = urlparse(url)
-    url = f'{url.scheme}://{url.netloc}'
-
-    conn = psycopg2.connect(DATABASE_URL)
-    cur = conn.cursor()
-    cur.execute("""
-        INSERT INTO table_urls (name, created_at)
-        VALUES (%s, %s);
-        """,
-        (url, datetime.datetime.now()))
-    cur.execute("""
-        SELECT id FROM table_urls
-        WHERE name = %s;
-        """,
-        (url, ))
-    id = cur.fetchone()[0]
-    cur.execute("""
-        SELECT * FROM table_urls
-        WHERE id = %s;
-        """,
-        (15, ))
-    url = cur.fetchone()
-    cur.close()
-    conn.close()
-
-    print(url)
-
+    id = TableUrls.select_id(url)
     return redirect(url_for('show_url', id=id), 302)
 
 
 @app.get('/urls')
 def show_urls():
-    urls = []
+    urls = TableUrls.select_urls()
 
     return render_template(
         'urls.html',
@@ -99,19 +63,8 @@ def show_urls():
 
 @app.get('/url/<id>')
 def show_url(id):
-    conn = psycopg2.connect(DATABASE_URL)
-    cur = conn.cursor()
-    cur.execute("""
-        SELECT * FROM table_urls
-        WHERE id = %s;
-        """,
-        (id, ))
-    url = cur.fetchone()
-    cur.close()
-    conn.close()
-    # print(url)
+    url = TableUrls.select_url(id)
 
-    # url = {'id': url[0], 'name': url[1], 'created_at': url[2]}
     messages = ''
     checks = ''
 
