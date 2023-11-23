@@ -18,10 +18,10 @@ class TableUrls():
                 INSERT INTO table_urls (name, created_at)
                 VALUES (%s, %s);
                 """,
-                (url, datetime.datetime.now()))
+                        (url, datetime.datetime.now()))
             conn.commit()
             res = True
-        except:
+        except psycopg2.Error:
             res = False
 
         cur.close()
@@ -37,14 +37,14 @@ class TableUrls():
             SELECT id FROM table_urls
             WHERE name = %s;
             """,
-            (url, ))
+                    (url, ))
         id = cur.fetchone()[0]
 
         cur.close()
         conn.close()
 
         return id
-    
+
     def select_url(id: int) -> dict:
         conn = psycopg2.connect(DATABASE_URL)
         cur = conn.cursor()
@@ -53,14 +53,14 @@ class TableUrls():
             SELECT * FROM table_urls
             WHERE id = %s;
             """,
-            (id, ))
+                    (id, ))
         url = Url(*cur.fetchone())
 
         cur.close()
         conn.close()
 
         return url.__dict__
-    
+
     def select_urls() -> list:
         conn = psycopg2.connect(DATABASE_URL)
         cur = conn.cursor()
@@ -74,7 +74,7 @@ class TableUrls():
         urls = [Url(*url).__dict__ for url in urls]
 
         return urls
-    
+
     def check_url(url: str) -> bool:
         conn = psycopg2.connect(DATABASE_URL)
         cur = conn.cursor()
@@ -93,8 +93,3 @@ class Url():
         self.id = id
         self.name = name
         self.created_at = created_at
-
-
-
-u = TableUrls.check_url('https://ru.hexlet.ru')
-print(u)
