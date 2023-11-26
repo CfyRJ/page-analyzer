@@ -26,13 +26,13 @@ jobs:
           sudo apt-get update
           sudo apt-get install postgresql
 
-      - name: Create test database
-        run: |
-          sudo -u postgres createdb python-project-83
-
       - name: Start PostgreSQL
         run: |
           sudo service postgresql start
+
+      - name: Create test database
+        run: |
+          sudo -u postgres createdb python-project-83
 
       - name: Install poetry and dependencies
         run: |
