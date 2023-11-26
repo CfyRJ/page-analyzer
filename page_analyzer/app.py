@@ -47,8 +47,9 @@ def add_url():
 
     if TableUrls.check_url(url):
         id = TableUrls.select_id(url)
-        flash('URL существует', 'error')
+        flash('Страница уже существует', 'info')
     else:
+        flash('Страница успешно добавлена', 'success')
         TableUrls.insert(url)
 
     id = TableUrls.select_id(url)
@@ -69,7 +70,7 @@ def show_urls():
 def show_url(id):
     url = TableUrls.select_url(id)
 
-    messages = ''
+    messages = get_flashed_messages(with_categories=True)
     checks = ''
 
     return render_template(
