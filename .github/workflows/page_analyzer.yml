@@ -11,6 +11,9 @@ jobs:
       matrix:
         python-version: ["3.8", "3.9", "3.10"]
 
+    env:
+      DATABASE_URL: "postgres://localhost/postgres"
+
     steps:
       - uses: actions/checkout@v3
       - name: Setup Python ${{ matrix.python-version }}
@@ -20,8 +23,9 @@ jobs:
       - name: Install poetry and dependencies
         run: |
           python -m pip install --upgrade pip
+          sudo apt install postgresql
           pip install poetry
-          make install
+          make build
       - name: Run linter and pytest
         run: |
           make lint
