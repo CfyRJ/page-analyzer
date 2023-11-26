@@ -20,16 +20,31 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
+
+      - name: Install PostgreSQL
+        run: |
+          sudo apt-get update
+          sudo apt-get install postgresql
+
+      - name: Create test database
+        run: |
+          sudo -u postgres createdb python-project-83
+
+      - name: Start PostgreSQL
+        run: |
+          sudo service postgresql start
+
       - name: Install poetry and dependencies
         run: |
           python -m pip install --upgrade pip
-          sudo apt install postgresql
           pip install poetry
           make build
+
       - name: Run linter and pytest
         run: |
           make lint
           make pytest
+
       - name: Test coverage
         uses: paambaati/codeclimate-action@v3.1.1
         if: github.ref_name == 'main'
