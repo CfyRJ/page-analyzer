@@ -4,10 +4,15 @@ from flask import redirect, request
 from flask import url_for
 from flask import flash, get_flashed_messages
 
+import requests
+from bs4 import BeautifulSoup
+
 import validators
 from urllib.parse import urlparse
 
 from page_analyzer.database_queries import TableUrls
+from page_analyzer.database_queries import UrlChecks
+from page_analyzer.database_queries import join_table
 
 
 app = Flask(__name__)
@@ -58,11 +63,11 @@ def add_url():
 
 @app.get('/urls')
 def show_urls():
-    urls = TableUrls.select_urls()
+    urls = join_table()
 
     return render_template(
         'urls.html',
-        urls=urls,
+        urls=urls
     )
 
 
@@ -71,7 +76,7 @@ def show_url(id):
     url = TableUrls.select_url(id)
 
     messages = get_flashed_messages(with_categories=True)
-    checks = ''
+    checks = UrlChecks.select_checks_url(id)
 
     return render_template(
         'url.html',
@@ -83,6 +88,31 @@ def show_url(id):
 
 @app.route('/url/<id>/checks', methods=['post'])
 def checks(id):
-    id = 0
+    url = request.form.to_dict()
+
+    try:
+        response = requests.get(url['name'])
+        flash('Страница успешно проверена', 'success')
+    except requests.RequestException:
+        flash('Произошла ошибка при проверке', 'error')
+        return redirect(url_for('show_url', id=id), 302)
+
+    status_code = response.status_code
+
+    soup = BeautifulSoup(response.text, 'html.parser')
+    h1 = soup.h1.string if soup.h1.string else ''
+    title = soup.title.string if soup.title.string else ''
+    try:
+        description = soup.find(attrs={"name": "description"})['content']
+    except TypeError:
+        description = ''
+
+    UrlChecks.insert({
+        'url_id': url['id'],
+        'status_code': status_code,
+        'h1': h1,
+        'title': title,
+        'description': description
+    })
 
     return redirect(url_for('show_url', id=id), 302)
