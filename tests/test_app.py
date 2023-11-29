@@ -20,7 +20,7 @@ def client():
     return app.test_client()
 
 
-def truncate() -> bool:
+def truncate_table_urls() -> bool:
     response = True
 
     conn = psycopg2.connect(DATABASE_URL)
@@ -28,6 +28,24 @@ def truncate() -> bool:
 
     try:
         cur.execute("TRUNCATE TABLE table_urls RESTART IDENTITY CASCADE;")
+        conn.commit()
+    except psycopg2.Error:
+        response = False
+
+    cur.close()
+    conn.close()
+
+    return response
+
+
+def truncate_url_checks() -> bool:
+    response = True
+
+    conn = psycopg2.connect(DATABASE_URL)
+    cur = conn.cursor()
+
+    try:
+        cur.execute("TRUNCATE TABLE url_checks RESTART IDENTITY CASCADE;")
         conn.commit()
     except psycopg2.Error:
         response = False
@@ -73,7 +91,7 @@ def test_succes_add_url(client: FlaskClient):
     assert bytes('Страница успешно добавлена',
                  encoding='utf-8') in response.data
 
-    truncate()
+    truncate_table_urls()
 
 
 def test_info_add_url(client: FlaskClient):
@@ -88,7 +106,27 @@ def test_info_add_url(client: FlaskClient):
     response = client.get('/url/1')
     assert bytes('Страница уже существует', encoding='utf-8') in response.data
 
-    truncate()
+    truncate_table_urls()
+
+
+def test_url_check(client: FlaskClient):
+    response = client.post('/urls', data={
+        "url": "https://hexlet.io"
+    })
+
+    response = client.post('/url/1/checks', data={
+        "name": "https://hexlet.io", 'id': 1
+    }, follow_redirects=True)
+
+    assert bytes('Страница успешно проверена',
+                 encoding='utf-8') in response.data
+    assert bytes('Online programming school', encoding='utf-8') in response.data
+    assert bytes('Programming education: online',
+                 encoding='utf-8') in response.data
+    assert bytes('Author training programs', encoding='utf-8') in response.data
+
+    truncate_table_urls()
+    truncate_url_checks()
 
 
 def test_order_urls(client: FlaskClient):
@@ -99,9 +137,16 @@ def test_order_urls(client: FlaskClient):
         "url": "https://mail.ru"
     })
 
+    response = client.post('/url/1/checks', data={
+        "name": "https://hexlet.io", 'id': 1
+    })
+
     response = client.get('/urls')
+
     url2 = response.data.find(b'https://mail.ru')
     url1 = response.data.find(b'https://hexlet.io')
     assert url2 < url1
+    assert bytes('200', encoding='utf-8') in response.data
 
-    truncate()
+    truncate_table_urls()
+    truncate_url_checks()
