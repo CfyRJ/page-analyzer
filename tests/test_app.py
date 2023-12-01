@@ -69,7 +69,7 @@ def test_succes_add_url(client: FlaskClient):
     })
     assert response.status_code == 302
 
-    response = client.get('/url/1')
+    response = client.get('/urls/1')
     assert bytes('Страница успешно добавлена',
                  encoding='utf-8') in response.data
 
@@ -77,7 +77,7 @@ def test_succes_add_url(client: FlaskClient):
 
 
 def test_info_add_url(client: FlaskClient):
-    response = client.post('/urls', data={
+    client.post('/urls', data={
         "url": "https://hexlet.io"
     })
     response = client.post('/urls', data={
@@ -85,18 +85,18 @@ def test_info_add_url(client: FlaskClient):
     })
     assert response.status_code == 302
 
-    response = client.get('/url/1')
+    response = client.get('/urls/1')
     assert bytes('Страница уже существует', encoding='utf-8') in response.data
 
     truncate_table_urls()
 
 
 def test_url_check(client: FlaskClient):
-    response = client.post('/urls', data={
+    client.post('/urls', data={
         "url": "https://hexlet.io"
     })
 
-    response = client.post('/url/1/checks', data={
+    response = client.post('/urls/1/checks', data={
         "name": "https://hexlet.io", 'id': 1
     }, follow_redirects=True)
 
@@ -111,14 +111,14 @@ def test_url_check(client: FlaskClient):
 
 
 def test_order_urls(client: FlaskClient):
-    response = client.post('/urls', data={
+    client.post('/urls', data={
         "url": "https://hexlet.io"
     })
-    response = client.post('/urls', data={
+    client.post('/urls', data={
         "url": "https://mail.ru"
     })
 
-    response = client.post('/url/1/checks', data={
+    client.post('/urls/1/checks', data={
         "name": "https://hexlet.io", 'id': 1
     })
 
@@ -136,7 +136,7 @@ def test_url_check_fail(client: FlaskClient):
     client.post('/urls', data={
         "url": "https://dfgh.ru"
     })
-    response = client.post('/url/1/checks', data={
+    response = client.post('/urls/1/checks', data={
         "name": "https://dfgh.ru", 'id': 1
     }, follow_redirects=True)
 
