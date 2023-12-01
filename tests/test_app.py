@@ -38,24 +38,6 @@ def truncate_table_urls() -> bool:
     return response
 
 
-def truncate_url_checks() -> bool:
-    response = True
-
-    conn = psycopg2.connect(DATABASE_URL)
-    cur = conn.cursor()
-
-    try:
-        cur.execute("TRUNCATE TABLE url_checks RESTART IDENTITY CASCADE;")
-        conn.commit()
-    except psycopg2.Error:
-        response = False
-
-    cur.close()
-    conn.close()
-
-    return response
-
-
 def test_index(client: FlaskClient):
     response = client.get('/')
 
@@ -126,7 +108,6 @@ def test_url_check(client: FlaskClient):
     assert bytes('Author training programs', encoding='utf-8') in response.data
 
     truncate_table_urls()
-    truncate_url_checks()
 
 
 def test_order_urls(client: FlaskClient):
@@ -149,4 +130,17 @@ def test_order_urls(client: FlaskClient):
     assert bytes('200', encoding='utf-8') in response.data
 
     truncate_table_urls()
-    truncate_url_checks()
+
+
+def test_url_check_fail(client: FlaskClient):
+    client.post('/urls', data={
+        "url": "https://dfgh.ru"
+    })
+    response = client.post('/url/1/checks', data={
+        "name": "https://dfgh.ru", 'id': 1
+    }, follow_redirects=True)
+
+    assert bytes('Произошла ошибка при проверке',
+                 encoding='utf-8') in response.data
+
+    truncate_table_urls()
