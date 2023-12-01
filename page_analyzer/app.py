@@ -71,7 +71,7 @@ def show_urls():
     )
 
 
-@app.get('/url/<id>')
+@app.get('/urls/<id>')
 def show_url(id):
     url = TableUrls.select_url(id)
 
@@ -86,7 +86,7 @@ def show_url(id):
     )
 
 
-@app.route('/url/<id>/checks', methods=['post'])
+@app.route('/urls/<id>/checks', methods=['post'])
 def checks(id):
     url = request.form.to_dict()
 
