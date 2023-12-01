@@ -91,13 +91,18 @@ def checks(id):
     url = request.form.to_dict()
 
     try:
-        response = requests.get(url['name'])
+        response = requests.get(url['name'], timeout=1)
         flash('Страница успешно проверена', 'success')
-    except requests.RequestException:
+    except (requests.exceptions.RequestException,
+            requests.exceptions.Timeout):
         flash('Произошла ошибка при проверке', 'error')
         return redirect(url_for('show_url', id=id), 302)
 
     status_code = response.status_code
+
+    if status_code != 200:
+        flash('Произошла ошибка при проверке', 'error')
+        return redirect(url_for('show_url', id=id), 302)
 
     soup = BeautifulSoup(response.text, 'html.parser')
     h1 = soup.h1.string if soup.h1.string else ''
