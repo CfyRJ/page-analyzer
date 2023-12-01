@@ -22,7 +22,7 @@ class TableUrls():
 
         try:
             cur.execute("""
-                INSERT INTO table_urls (name, created_at)
+                INSERT INTO urls (name, created_at)
                 VALUES (%s, %s);
                 """,
                         (url, datetime.datetime.now()))
@@ -41,7 +41,7 @@ class TableUrls():
         cur = conn.cursor()
 
         cur.execute("""
-            SELECT id FROM table_urls
+            SELECT id FROM urls
             WHERE name = %s;
             """,
                     (url, ))
@@ -57,7 +57,7 @@ class TableUrls():
         cur = conn.cursor()
 
         cur.execute("""
-            SELECT * FROM table_urls
+            SELECT * FROM urls
             WHERE id = %s;
             """,
                     (id, ))
@@ -72,7 +72,7 @@ class TableUrls():
         conn = psycopg2.connect(DATABASE_URL)
         cur = conn.cursor()
 
-        cur.execute("SELECT * FROM table_urls ORDER BY id DESC;")
+        cur.execute("SELECT * FROM urls ORDER BY id DESC;")
         urls = cur.fetchall()
 
         cur.close()
@@ -86,7 +86,7 @@ class TableUrls():
         conn = psycopg2.connect(DATABASE_URL)
         cur = conn.cursor()
 
-        cur.execute("SELECT * FROM table_urls WHERE name = %s;", (url, ))
+        cur.execute("SELECT * FROM urls WHERE name = %s;", (url, ))
         response = True if cur.fetchone() else False
 
         cur.close()
@@ -161,7 +161,7 @@ def join_table() -> list:
     conn = psycopg2.connect(DATABASE_URL)
     cur = conn.cursor()
 
-    cur.execute("""SELECT id, name FROM table_urls ORDER BY id DESC;""")
+    cur.execute("""SELECT id, name FROM urls ORDER BY id DESC;""")
     table_urls = cur.fetchall()
     cur.execute("""SELECT url_checks.url_id, url_checks.created_at, status_code
                    FROM url_checks JOIN (
