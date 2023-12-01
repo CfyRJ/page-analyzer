@@ -27,7 +27,7 @@ def truncate_table_urls() -> bool:
     cur = conn.cursor()
 
     try:
-        cur.execute("TRUNCATE TABLE table_urls RESTART IDENTITY CASCADE;")
+        cur.execute("TRUNCATE TABLE urls RESTART IDENTITY CASCADE;")
         conn.commit()
     except psycopg2.Error:
         response = False
