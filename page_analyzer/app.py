@@ -1,22 +1,35 @@
+import os
+
 from flask import Flask
 from flask import render_template
 from flask import redirect, request
 from flask import url_for
 from flask import flash, get_flashed_messages
 
-import requests
-from bs4 import BeautifulSoup
-
 import validators
 from urllib.parse import urlparse
 
-from page_analyzer.database_queries import TableUrls
-from page_analyzer.database_queries import UrlChecks
+from dotenv import load_dotenv
+
+from page_analyzer.database_queries import insert_urls
+from page_analyzer.database_queries import select_url
+from page_analyzer.database_queries import select_url_by_name
+from page_analyzer.database_queries import insert_url_checks
+from page_analyzer.database_queries import select_checks_url
 from page_analyzer.database_queries import join_table
+
+from page_analyzer.work_url import get_response
+
+from page_analyzer.work_html import get_h1
+from page_analyzer.work_html import get_title
+from page_analyzer.work_html import get_description
 
 
 app = Flask(__name__)
-app.secret_key = "secret_key"
+
+load_dotenv()
+DATABASE_URL = os.getenv('DATABASE_URL')
+app.secret_key = os.getenv('SECRET_KEY')
 
 
 @app.route('/')
@@ -50,20 +63,20 @@ def add_url():
     url = urlparse(url)
     url = f'{url.scheme}://{url.netloc}'
 
-    if TableUrls.check_url(url):
-        id = TableUrls.select_id(url)
+    if select_url_by_name(url, DATABASE_URL):
         flash('Страница уже существует', 'info')
     else:
         flash('Страница успешно добавлена', 'success')
-        TableUrls.insert(url)
+        insert_urls(url, DATABASE_URL)
 
-    id = TableUrls.select_id(url)
+    id = select_url_by_name(url, DATABASE_URL)
+
     return redirect(url_for('show_url', id=id), 302)
 
 
 @app.get('/urls')
 def show_urls():
-    urls = join_table()
+    urls = join_table(DATABASE_URL)
 
     return render_template(
         'urls.html',
@@ -73,10 +86,10 @@ def show_urls():
 
 @app.get('/urls/<id>')
 def show_url(id):
-    url = TableUrls.select_url(id)
+    url = select_url(id, DATABASE_URL)
 
     messages = get_flashed_messages(with_categories=True)
-    checks = UrlChecks.select_checks_url(id)
+    checks = select_checks_url(id, DATABASE_URL)
 
     return render_template(
         'url.html',
@@ -90,34 +103,28 @@ def show_url(id):
 def checks(id):
     url = request.form.to_dict()
 
-    try:
-        response = requests.get(url['name'], timeout=1)
-        flash('Страница успешно проверена', 'success')
-    except (requests.exceptions.RequestException,
-            requests.exceptions.Timeout):
+    response = get_response(url['name'])
+    if not response:
         flash('Произошла ошибка при проверке', 'error')
         return redirect(url_for('show_url', id=id), 302)
 
     status_code = response.status_code
-
     if status_code != 200:
         flash('Произошла ошибка при проверке', 'error')
         return redirect(url_for('show_url', id=id), 302)
 
-    soup = BeautifulSoup(response.text, 'html.parser')
-    h1 = soup.h1.string if soup.h1.string else ''
-    title = soup.title.string if soup.title.string else ''
-    try:
-        description = soup.find(attrs={"name": "description"})['content']
-    except TypeError:
-        description = ''
+    h1 = get_h1(response)
+    title = get_title(response)
+    description = get_description(response)
 
-    UrlChecks.insert({
+    flash('Страница успешно проверена', 'success')
+
+    insert_url_checks({
         'url_id': url['id'],
         'status_code': status_code,
         'h1': h1,
         'title': title,
         'description': description
-    })
+    }, DATABASE_URL)
 
     return redirect(url_for('show_url', id=id), 302)
