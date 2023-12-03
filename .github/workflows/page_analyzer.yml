@@ -13,6 +13,7 @@ jobs:
 
     env:
       DATABASE_URL: ${{ vars.DATABASE_URL }}
+      SECRET_KEY: ${{ vars.SECRET_KEY }}
 
     steps:
       - uses: actions/checkout@v3
