@@ -1,104 +1,62 @@
 import psycopg2
-import os
-import datetime
-from dotenv import load_dotenv
+import psycopg2.extras
 
 
-load_dotenv()
-DATABASE_URL = os.getenv('DATABASE_URL')
-
-
-class Url():
-    def __init__(self, id, name, created_at) -> None:
-        self.id = id
-        self.name = name
-        self.created_at = created_at
-
-
-class TableUrls():
-    def insert(url: str) -> bool:
-        conn = psycopg2.connect(DATABASE_URL)
-        cur = conn.cursor()
+def insert_urls(url: str, database_url: str) -> bool:
+    conn = psycopg2.connect(database_url)
+    with conn.cursor() as cur:
 
         try:
             cur.execute("""
-                INSERT INTO urls (name, created_at)
-                VALUES (%s, %s);
+                INSERT INTO urls (name)
+                VALUES (%s);
                 """,
-                        (url, datetime.datetime.now()))
+                        (url,))
             conn.commit()
             res = True
         except psycopg2.Error:
             res = False
 
-        cur.close()
-        conn.close()
+    conn.close()
 
-        return res
+    return res
 
-    def select_id(url: str) -> id:
-        conn = psycopg2.connect(DATABASE_URL)
-        cur = conn.cursor()
+
+def select_url_by_name(url: str, database_url: str) -> int:
+    conn = psycopg2.connect(database_url)
+    with conn.cursor() as cur:
 
         cur.execute("""
             SELECT id FROM urls
             WHERE name = %s;
             """,
                     (url, ))
-        id = cur.fetchone()[0]
+        id = cur.fetchone()
 
-        cur.close()
-        conn.close()
+    conn.close()
 
-        return id
+    return id[0] if id else 0
 
-    def select_url(id: int) -> dict:
-        conn = psycopg2.connect(DATABASE_URL)
-        cur = conn.cursor()
+
+def select_url(id: int, database_url: str) -> dict:
+    conn = psycopg2.connect(database_url)
+    with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
 
         cur.execute("""
             SELECT * FROM urls
             WHERE id = %s;
             """,
                     (id, ))
-        url = Url(*cur.fetchone())
+        url = cur.fetchone()
 
-        cur.close()
-        conn.close()
+    conn.close()
 
-        return url.__dict__
-
-    def select_urls() -> list:
-        conn = psycopg2.connect(DATABASE_URL)
-        cur = conn.cursor()
-
-        cur.execute("SELECT * FROM urls ORDER BY id DESC;")
-        urls = cur.fetchall()
-
-        cur.close()
-        conn.close()
-
-        urls = [Url(*url).__dict__ for url in urls]
-
-        return urls
-
-    def check_url(url: str) -> bool:
-        conn = psycopg2.connect(DATABASE_URL)
-        cur = conn.cursor()
-
-        cur.execute("SELECT * FROM urls WHERE name = %s;", (url, ))
-        response = True if cur.fetchone() else False
-
-        cur.close()
-        conn.close()
-
-        return response
+    return url
 
 
-class UrlChecks:
-    def insert(check_date: dict) -> bool:
-        conn = psycopg2.connect(DATABASE_URL)
-        cur = conn.cursor()
+def insert_url_checks(check_date: dict, database_url: str) -> bool:
+    conn = psycopg2.connect(database_url)
+    with conn.cursor() as cur:
 
         try:
             cur.execute("""
@@ -107,31 +65,28 @@ class UrlChecks:
                         status_code,
                         h1,
                         title,
-                        description,
-                        created_at)
-                VALUES (%s, %s, %s, %s, %s, %s);
+                        description)
+                VALUES (%s, %s, %s, %s, %s);
                 """,
                         (check_date['url_id'],
                          check_date['status_code'],
                          check_date['h1'],
                          check_date['title'],
-                         check_date['description'],
-                         datetime.datetime.now())
+                         check_date['description'])
                         )
             conn.commit()
             res = True
         except psycopg2.Error:
             res = False
 
-        cur.close()
-        conn.close()
+    conn.close()
 
-        return res
+    return res
 
-    @classmethod
-    def select_checks_url(cls, url_id: int) -> list:
-        conn = psycopg2.connect(DATABASE_URL)
-        cur = conn.cursor()
+
+def select_checks_url(url_id: int, database_url: str) -> list:
+    conn = psycopg2.connect(database_url)
+    with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
 
         cur.execute("""SELECT * FROM url_checks
                     WHERE url_id = %s
@@ -140,38 +95,25 @@ class UrlChecks:
                     )
         checks = cur.fetchall()
 
-        cur.close()
-        conn.close()
+    conn.close()
 
-        checks = [cls.make_check(check) for check in checks]
-
-        return checks
-
-    def make_check(check: list) -> dict:
-        return {'id': check[0],
-                'url_id': check[1],
-                'status_code': check[2],
-                'h1': check[3],
-                'title': check[4],
-                'description': check[5],
-                'data': check[6]}
+    return checks
 
 
-def join_table() -> list:
-    conn = psycopg2.connect(DATABASE_URL)
-    cur = conn.cursor()
+def join_table(database_url: str) -> list:
+    conn = psycopg2.connect(database_url)
+    with conn.cursor() as cur:
 
-    cur.execute("""SELECT id, name FROM urls ORDER BY id DESC;""")
-    table_urls = cur.fetchall()
-    cur.execute("""SELECT url_checks.url_id, url_checks.created_at, status_code
-                   FROM url_checks JOIN (
-                       SELECT url_id, MAX(created_at) AS created_at
-                       FROM url_checks GROUP BY url_id) AS tab
-                   ON url_checks.url_id=tab.url_id
-                   AND url_checks.created_at=tab.created_at;""")
-    url_checks = cur.fetchall()
+        cur.execute("""SELECT id, name FROM urls ORDER BY id DESC;""")
+        table_urls = cur.fetchall()
+        cur.execute("""SELECT url_checks.url_id, url_checks.created_at, status_code
+                       FROM url_checks JOIN (
+                           SELECT url_id, MAX(created_at) AS created_at
+                           FROM url_checks GROUP BY url_id) AS tab
+                       ON url_checks.url_id=tab.url_id
+                       AND url_checks.created_at=tab.created_at;""")
+        url_checks = cur.fetchall()
 
-    cur.close()
     conn.close()
 
     res = []
