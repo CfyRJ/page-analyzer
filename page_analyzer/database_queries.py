@@ -106,7 +106,10 @@ def join_table(database_url: str) -> list:
 
         cur.execute("""SELECT id, name FROM urls ORDER BY id DESC;""")
         table_urls = cur.fetchall()
-        cur.execute("""SELECT url_checks.url_id, url_checks.created_at, status_code
+        cur.execute("""SELECT
+                    url_checks.url_id,
+                    url_checks.created_at,
+                    status_code
                        FROM url_checks JOIN (
                            SELECT url_id, MAX(created_at) AS created_at
                            FROM url_checks GROUP BY url_id) AS tab
