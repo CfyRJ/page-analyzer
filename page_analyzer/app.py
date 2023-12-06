@@ -102,9 +102,6 @@ def checks(id):
         return redirect(url_for('show_url', id=id), 302)
 
     status_code = response.status_code
-    if status_code != 200:
-        flash('Произошла ошибка при проверке', 'error')
-        return redirect(url_for('show_url', id=id), 302)
 
     check_data = get_check_result(response)
     check_data.update({
