@@ -2,7 +2,7 @@ import psycopg2
 import psycopg2.extras
 
 
-def insert_urls(url: str, database_url: str) -> bool:
+def add_urls(url: str, database_url: str) -> bool:
     conn = psycopg2.connect(database_url)
     with conn.cursor() as cur:
 
@@ -22,7 +22,7 @@ def insert_urls(url: str, database_url: str) -> bool:
     return res
 
 
-def select_url_by_name(url: str, database_url: str) -> int:
+def get_url_by_name(url: str, database_url: str) -> int:
     conn = psycopg2.connect(database_url)
     with conn.cursor() as cur:
 
@@ -38,7 +38,7 @@ def select_url_by_name(url: str, database_url: str) -> int:
     return id[0] if id else 0
 
 
-def select_url(id: int, database_url: str) -> dict:
+def get_url(id: int, database_url: str) -> dict:
     conn = psycopg2.connect(database_url)
     with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
 
@@ -54,7 +54,7 @@ def select_url(id: int, database_url: str) -> dict:
     return url
 
 
-def insert_url_checks(check_date: dict, database_url: str) -> bool:
+def add_url_checks(check_date: dict, database_url: str) -> bool:
     conn = psycopg2.connect(database_url)
     with conn.cursor() as cur:
 
@@ -84,7 +84,7 @@ def insert_url_checks(check_date: dict, database_url: str) -> bool:
     return res
 
 
-def select_checks_url(url_id: int, database_url: str) -> list:
+def get_checks_url(url_id: int, database_url: str) -> list:
     conn = psycopg2.connect(database_url)
     with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
 
@@ -100,7 +100,7 @@ def select_checks_url(url_id: int, database_url: str) -> list:
     return checks
 
 
-def join_table(database_url: str) -> list:
+def get_url_check(database_url: str) -> list:
     conn = psycopg2.connect(database_url)
     with conn.cursor() as cur:
 

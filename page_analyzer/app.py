@@ -58,20 +58,20 @@ def add_url():
     url = urlparse(url)
     url = f'{url.scheme}://{url.netloc}'
 
-    if db.select_url_by_name(url, DATABASE_URL):
+    if db.get_url_by_name(url, DATABASE_URL):
         flash('Страница уже существует', 'info')
     else:
         flash('Страница успешно добавлена', 'success')
-        db.insert_urls(url, DATABASE_URL)
+        db.add_urls(url, DATABASE_URL)
 
-    id = db.select_url_by_name(url, DATABASE_URL)
+    id = db.get_url_by_name(url, DATABASE_URL)
 
     return redirect(url_for('show_url', id=id), 302)
 
 
 @app.get('/urls')
 def show_urls():
-    urls = db.join_table(DATABASE_URL)
+    urls = db.get_url_check(DATABASE_URL)
 
     return render_template(
         'urls.html',
@@ -81,10 +81,10 @@ def show_urls():
 
 @app.get('/urls/<id>')
 def show_url(id):
-    url = db.select_url(id, DATABASE_URL)
+    url = db.get_url(id, DATABASE_URL)
 
     messages = get_flashed_messages(with_categories=True)
-    checks = db.select_checks_url(id, DATABASE_URL)
+    checks = db.get_checks_url(id, DATABASE_URL)
 
     return render_template(
         'url.html',
@@ -114,7 +114,7 @@ def checks(id):
 
     flash('Страница успешно проверена', 'success')
 
-    db.insert_url_checks({
+    db.add_url_checks({
         'url_id': url['id'],
         'status_code': status_code,
         'h1': h1,
