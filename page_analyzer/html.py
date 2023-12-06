@@ -9,7 +9,7 @@ def get_check_result(response) -> dict:
         description = soup.find(attrs={"name": "description"})['content']
     except TypeError:
         description = ''
-    
+
     return {'h1': h1,
             'title': title,
             'description': description

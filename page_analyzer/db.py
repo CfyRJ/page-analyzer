@@ -49,7 +49,8 @@ def get_url(id: int, conn: psycopg2.extensions.connection) -> dict:
     return url
 
 
-def add_url_checks(check_date: dict, conn: psycopg2.extensions.connection) -> bool:
+def add_url_checks(check_date: dict,
+                   conn: psycopg2.extensions.connection) -> bool:
     with conn.cursor() as cur:
 
         try:
