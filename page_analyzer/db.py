@@ -2,8 +2,11 @@ import psycopg2
 import psycopg2.extras
 
 
-def add_urls(url: str, database_url: str) -> bool:
-    conn = psycopg2.connect(database_url)
+def creat_connection(database_url: str) -> psycopg2.extensions.connection:
+    return psycopg2.connect(database_url)
+
+
+def add_urls(url: str, conn: psycopg2.extensions.connection) -> bool:
     with conn.cursor() as cur:
 
         try:
@@ -17,13 +20,10 @@ def add_urls(url: str, database_url: str) -> bool:
         except psycopg2.Error:
             res = False
 
-    conn.close()
-
     return res
 
 
-def get_url_by_name(url: str, database_url: str) -> int:
-    conn = psycopg2.connect(database_url)
+def get_url_by_name(url: str, conn: psycopg2.extensions.connection) -> int:
     with conn.cursor() as cur:
 
         cur.execute("""
@@ -33,13 +33,10 @@ def get_url_by_name(url: str, database_url: str) -> int:
                     (url, ))
         id = cur.fetchone()
 
-    conn.close()
-
     return id[0] if id else 0
 
 
-def get_url(id: int, database_url: str) -> dict:
-    conn = psycopg2.connect(database_url)
+def get_url(id: int, conn: psycopg2.extensions.connection) -> dict:
     with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
 
         cur.execute("""
@@ -49,13 +46,10 @@ def get_url(id: int, database_url: str) -> dict:
                     (id, ))
         url = cur.fetchone()
 
-    conn.close()
-
     return url
 
 
-def add_url_checks(check_date: dict, database_url: str) -> bool:
-    conn = psycopg2.connect(database_url)
+def add_url_checks(check_date: dict, conn: psycopg2.extensions.connection) -> bool:
     with conn.cursor() as cur:
 
         try:
@@ -79,13 +73,10 @@ def add_url_checks(check_date: dict, database_url: str) -> bool:
         except psycopg2.Error:
             res = False
 
-    conn.close()
-
     return res
 
 
-def get_checks_url(url_id: int, database_url: str) -> list:
-    conn = psycopg2.connect(database_url)
+def get_checks_url(url_id: int, conn: psycopg2.extensions.connection) -> list:
     with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
 
         cur.execute("""SELECT * FROM url_checks
@@ -95,13 +86,10 @@ def get_checks_url(url_id: int, database_url: str) -> list:
                     )
         checks = cur.fetchall()
 
-    conn.close()
-
     return checks
 
 
-def get_url_check(database_url: str) -> list:
-    conn = psycopg2.connect(database_url)
+def get_url_check(conn: psycopg2.extensions.connection) -> list:
     with conn.cursor() as cur:
 
         cur.execute("""SELECT id, name FROM urls ORDER BY id DESC;""")
@@ -116,8 +104,6 @@ def get_url_check(database_url: str) -> list:
                        ON url_checks.url_id=tab.url_id
                        AND url_checks.created_at=tab.created_at;""")
         url_checks = cur.fetchall()
-
-    conn.close()
 
     res = []
     for id, name in table_urls:

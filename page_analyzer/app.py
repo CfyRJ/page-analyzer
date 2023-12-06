@@ -12,9 +12,7 @@ from urllib.parse import urlparse
 from dotenv import load_dotenv
 
 from page_analyzer import db
-
 from page_analyzer.work_url import get_response
-
 from page_analyzer.work_html import get_check_result
 
 
@@ -56,20 +54,24 @@ def add_url():
     url = urlparse(url)
     url = f'{url.scheme}://{url.netloc}'
 
-    if db.get_url_by_name(url, DATABASE_URL):
+    conn = db.creat_connection(DATABASE_URL)
+    if db.get_url_by_name(url, conn):
         flash('Страница уже существует', 'info')
     else:
         flash('Страница успешно добавлена', 'success')
-        db.add_urls(url, DATABASE_URL)
+        db.add_urls(url, conn)
 
-    id = db.get_url_by_name(url, DATABASE_URL)
+    id = db.get_url_by_name(url, conn)
+    conn.close()
 
     return redirect(url_for('show_url', id=id), 302)
 
 
 @app.get('/urls')
 def show_urls():
-    urls = db.get_url_check(DATABASE_URL)
+    conn = db.creat_connection(DATABASE_URL)
+    urls = db.get_url_check(conn)
+    conn.close()
 
     return render_template(
         'urls.html',
@@ -79,10 +81,12 @@ def show_urls():
 
 @app.get('/urls/<id>')
 def show_url(id):
-    url = db.get_url(id, DATABASE_URL)
+    conn = db.creat_connection(DATABASE_URL)
+    url = db.get_url(id, conn)
+    checks = db.get_checks_url(id, conn)
+    conn.close()
 
     messages = get_flashed_messages(with_categories=True)
-    checks = db.get_checks_url(id, DATABASE_URL)
 
     return render_template(
         'url.html',
@@ -111,6 +115,8 @@ def checks(id):
 
     flash('Страница успешно проверена', 'success')
 
-    db.add_url_checks(check_data, DATABASE_URL)
+    conn = db.creat_connection(DATABASE_URL)
+    db.add_url_checks(check_data, conn)
+    conn.close()
 
     return redirect(url_for('show_url', id=id), 302)
