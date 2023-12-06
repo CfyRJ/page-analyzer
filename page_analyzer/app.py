@@ -15,9 +15,7 @@ from page_analyzer import db
 
 from page_analyzer.work_url import get_response
 
-from page_analyzer.work_html import get_h1
-from page_analyzer.work_html import get_title
-from page_analyzer.work_html import get_description
+from page_analyzer.work_html import get_check_result
 
 
 app = Flask(__name__)
@@ -108,18 +106,14 @@ def checks(id):
         flash('Произошла ошибка при проверке', 'error')
         return redirect(url_for('show_url', id=id), 302)
 
-    h1 = get_h1(response)
-    title = get_title(response)
-    description = get_description(response)
+    check_data = get_check_result(response)
+    check_data.update({
+        'url_id': url['id'],
+        'status_code': status_code,
+    })
 
     flash('Страница успешно проверена', 'success')
 
-    db.add_url_checks({
-        'url_id': url['id'],
-        'status_code': status_code,
-        'h1': h1,
-        'title': title,
-        'description': description
-    }, DATABASE_URL)
+    db.add_url_checks(check_data, DATABASE_URL)
 
     return redirect(url_for('show_url', id=id), 302)

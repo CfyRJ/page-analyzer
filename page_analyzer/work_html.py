@@ -1,19 +1,16 @@
 from bs4 import BeautifulSoup
 
 
-def get_h1(response) -> (str, None):
+def get_check_result(response) -> dict:
     soup = BeautifulSoup(response.text, 'html.parser')
-    return soup.h1.string if soup.h1 else ''
-
-
-def get_title(response) -> (str, None):
-    soup = BeautifulSoup(response.text, 'html.parser')
-    return soup.title.string if soup.title else ''
-
-
-def get_description(response) -> (str, None):
-    soup = BeautifulSoup(response.text, 'html.parser')
+    h1 = soup.h1.string if soup.h1 else ''
+    title = soup.title.string if soup.title else ''
     try:
-        return soup.find(attrs={"name": "description"})['content']
+        description = soup.find(attrs={"name": "description"})['content']
     except TypeError:
-        return ''
+        description = ''
+    
+    return {'h1': h1,
+            'title': title,
+            'description': description
+            }
