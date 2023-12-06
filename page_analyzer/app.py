@@ -12,8 +12,8 @@ from urllib.parse import urlparse
 from dotenv import load_dotenv
 
 from page_analyzer import db
-from page_analyzer.work_url import get_response
-from page_analyzer.work_html import get_check_result
+from page_analyzer.url import get_response
+from page_analyzer.html import get_check_result
 
 
 app = Flask(__name__)
