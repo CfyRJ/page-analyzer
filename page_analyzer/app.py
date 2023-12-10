@@ -54,7 +54,7 @@ def add_url():
     url = urlparse(url)
     url = f'{url.scheme}://{url.netloc}'
 
-    conn = db.creat_connection(DATABASE_URL)
+    conn = db.create_connection(DATABASE_URL)
     if db.get_url_by_name(url, conn):
         flash('Страница уже существует', 'info')
     else:
@@ -69,7 +69,7 @@ def add_url():
 
 @app.get('/urls')
 def show_urls():
-    conn = db.creat_connection(DATABASE_URL)
+    conn = db.create_connection(DATABASE_URL)
     urls = db.get_url_check(conn)
     conn.close()
 
@@ -81,7 +81,7 @@ def show_urls():
 
 @app.get('/urls/<id>')
 def show_url(id):
-    conn = db.creat_connection(DATABASE_URL)
+    conn = db.create_connection(DATABASE_URL)
     url = db.get_url(id, conn)
     checks = db.get_checks_url(id, conn)
     conn.close()
@@ -115,7 +115,7 @@ def checks(id):
 
     flash('Страница успешно проверена', 'success')
 
-    conn = db.creat_connection(DATABASE_URL)
+    conn = db.create_connection(DATABASE_URL)
     db.add_url_checks(check_data, conn)
     conn.close()
 

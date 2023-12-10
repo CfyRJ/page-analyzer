@@ -2,7 +2,7 @@ import psycopg2
 import psycopg2.extras
 
 
-def creat_connection(database_url: str) -> psycopg2.extensions.connection:
+def create_connection(database_url: str) -> psycopg2.extensions.connection:
     return psycopg2.connect(database_url)
 
 
