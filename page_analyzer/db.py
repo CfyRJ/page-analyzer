@@ -6,6 +6,10 @@ def create_connection(database_url: str) -> psycopg2.extensions.connection:
     return psycopg2.connect(database_url)
 
 
+def close(conn: psycopg2.extensions.connection) -> None:
+    conn.close()
+
+
 def add_urls(url: str, conn: psycopg2.extensions.connection) -> bool:
     with conn.cursor() as cur:
 

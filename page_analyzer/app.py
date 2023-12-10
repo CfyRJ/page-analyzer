@@ -10,7 +10,6 @@ from dotenv import load_dotenv
 
 from page_analyzer import db
 from page_analyzer import url as _url
-# from page_analyzer.url import get_response, validate_url
 from page_analyzer.html import get_check_result
 
 
@@ -58,7 +57,7 @@ def add_url():
         flash(*message)
 
     url = db.get_url_by_name(url, conn)
-    conn.close()
+    db.close(conn)
 
     return redirect(url_for('show_url', id=url['id']), 302)
 
@@ -67,7 +66,7 @@ def add_url():
 def show_urls():
     conn = db.create_connection(DATABASE_URL)
     urls = db.get_url_check(conn)
-    conn.close()
+    db.close(conn)
 
     return render_template(
         'urls.html',
@@ -80,7 +79,7 @@ def show_url(id):
     conn = db.create_connection(DATABASE_URL)
     url = db.get_url(id, conn)
     checks = db.get_checks_url(id, conn)
-    conn.close()
+    db.close(conn)
 
     messages = get_flashed_messages(with_categories=True)
 
@@ -113,6 +112,6 @@ def checks(id):
 
     conn = db.create_connection(DATABASE_URL)
     db.add_url_checks(check_data, conn)
-    conn.close()
+    db.close(conn)
 
     return redirect(url_for('show_url', id=id), 302)
