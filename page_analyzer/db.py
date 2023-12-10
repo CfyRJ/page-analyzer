@@ -77,6 +77,7 @@ def add_url_check(conn: psycopg2.extensions.connection,
             conn.commit()
             res = True
         except psycopg2.Error:
+            print('Error adding to database "url_checks".')
             res = False
 
     return res

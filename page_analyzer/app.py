@@ -112,7 +112,9 @@ def checks(id):
     flash('Страница успешно проверена', 'success')
 
     conn = db.create_connection(DATABASE_URL)
-    db.add_url_check(conn, check_data)
+    flage = db.add_url_check(conn, check_data)
     db.close(conn)
 
-    return redirect(url_for('show_url', id=id), 302)
+    redirect_code = 302 if flage else 500
+
+    return redirect(url_for('show_url', id=id), redirect_code)
