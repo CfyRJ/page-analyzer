@@ -50,12 +50,12 @@ def add_url():
     url_input = _url.normalize_url(url)
 
     conn = db.create_connection(DATABASE_URL)
-    url = db.get_url_by_name(url_input, conn)
+    url = db.get_url_by_name(conn, url_input)
     if url:
         flash('Страница уже существует', 'info')
         id = url['id']
     else:
-        id, message = db.add_url(url_input, conn)
+        id, message = db.add_url(conn, url_input)
         flash(*message)
 
     db.close(conn)
@@ -78,8 +78,8 @@ def show_urls():
 @app.get('/urls/<id>')
 def show_url(id):
     conn = db.create_connection(DATABASE_URL)
-    url = db.get_url(id, conn)
-    checks = db.get_checks_url(id, conn)
+    url = db.get_url(conn, id)
+    checks = db.get_checks_url(conn, id)
     db.close(conn)
 
     messages = get_flashed_messages(with_categories=True)
@@ -112,7 +112,7 @@ def checks(id):
     flash('Страница успешно проверена', 'success')
 
     conn = db.create_connection(DATABASE_URL)
-    db.add_url_check(check_data, conn)
+    db.add_url_check(conn, check_data)
     db.close(conn)
 
     return redirect(url_for('show_url', id=id), 302)

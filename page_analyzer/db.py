@@ -10,7 +10,7 @@ def close(conn: psycopg2.extensions.connection) -> None:
     conn.close()
 
 
-def add_url(url: str, conn: psycopg2.extensions.connection) -> int:
+def add_url(conn: psycopg2.extensions.connection, url: str) -> int:
     with conn.cursor() as cur:
 
         try:
@@ -28,7 +28,7 @@ def add_url(url: str, conn: psycopg2.extensions.connection) -> int:
     return id, message
 
 
-def get_url_by_name(url: str, conn: psycopg2.extensions.connection) -> dict:
+def get_url_by_name(conn: psycopg2.extensions.connection, url: str) -> dict:
     with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
 
         cur.execute("""
@@ -41,7 +41,7 @@ def get_url_by_name(url: str, conn: psycopg2.extensions.connection) -> dict:
     return url
 
 
-def get_url(id: int, conn: psycopg2.extensions.connection) -> dict:
+def get_url(conn: psycopg2.extensions.connection, id: int) -> dict:
     with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
 
         cur.execute("""
@@ -54,8 +54,8 @@ def get_url(id: int, conn: psycopg2.extensions.connection) -> dict:
     return url
 
 
-def add_url_check(check_date: dict,
-                   conn: psycopg2.extensions.connection) -> bool:
+def add_url_check(conn: psycopg2.extensions.connection,
+                   check_date: dict) -> bool:
     with conn.cursor() as cur:
 
         try:
@@ -82,7 +82,7 @@ def add_url_check(check_date: dict,
     return res
 
 
-def get_checks_url(url_id: int, conn: psycopg2.extensions.connection) -> list:
+def get_checks_url(conn: psycopg2.extensions.connection, url_id: int) -> list:
     with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
 
         cur.execute("""SELECT * FROM url_checks
