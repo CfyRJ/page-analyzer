@@ -16,7 +16,8 @@ from page_analyzer.html import get_check_result
 app = Flask(__name__)
 
 load_dotenv()
-DATABASE_URL = os.getenv('DATABASE_URL')
+# DATABASE_URL = os.getenv('DATABASE_URL')
+app.config['DATABASE_URL'] = os.getenv('DATABASE_URL')
 app.secret_key = os.getenv('SECRET_KEY')
 
 
@@ -49,7 +50,7 @@ def add_url():
 
     url_input = _url.normalize_url(url)
 
-    conn = db.create_connection(DATABASE_URL)
+    conn = db.create_connection(app.config)
     url = db.get_url_by_name(conn, url_input)
     if url:
         flash('Страница уже существует', 'info')
@@ -65,7 +66,7 @@ def add_url():
 
 @app.get('/urls')
 def show_urls():
-    conn = db.create_connection(DATABASE_URL)
+    conn = db.create_connection(app.config)
     urls = db.get_url_check(conn)
     db.close(conn)
 
@@ -77,7 +78,7 @@ def show_urls():
 
 @app.get('/urls/<id>')
 def show_url(id):
-    conn = db.create_connection(DATABASE_URL)
+    conn = db.create_connection(app.config)
     url = db.get_url(conn, id)
     checks = db.get_checks_url(conn, id)
     db.close(conn)
@@ -111,7 +112,7 @@ def checks(id):
 
     flash('Страница успешно проверена', 'success')
 
-    conn = db.create_connection(DATABASE_URL)
+    conn = db.create_connection(app.config)
     flage = db.add_url_check(conn, check_data)
     db.close(conn)
 

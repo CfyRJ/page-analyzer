@@ -2,8 +2,8 @@ import psycopg2
 import psycopg2.extras
 
 
-def create_connection(database_url: str) -> psycopg2.extensions.connection:
-    return psycopg2.connect(database_url)
+def create_connection(config: dict) -> psycopg2.extensions.connection:
+    return psycopg2.connect(config['DATABASE_URL'])
 
 
 def close(conn: psycopg2.extensions.connection) -> None:
