@@ -7,7 +7,7 @@
         <h1 class="display-3">Анализатор страниц</h1>
         <p class="leas">Бесплатно проверяйте сайты на SEO-пригодность</p>
         <form class="d-flex justify-content-center" action="/urls" method="post">
-            <input type="text" class="form-control" name="url" placeholder="https//:www.example.com" value="{{ input_url }}">
+            <input type="text" class="form-control" name="url" placeholder="https//:www.example.com" value="{{ input_url if input_url is defined else '' }}">
             <input type="submit" class="btn btn-primary  btn-lg ms-3 px-5 text-uppercase mx-3" value="Проверить">
         </form>
     </div>
