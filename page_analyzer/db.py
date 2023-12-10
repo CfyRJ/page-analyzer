@@ -100,7 +100,7 @@ def get_url_check(conn: psycopg2.extensions.connection) -> list:
     with conn.cursor() as cur:
 
         cur.execute("""SELECT id, name FROM urls ORDER BY id DESC;""")
-        table_urls = cur.fetchall()
+        urls = cur.fetchall()
         cur.execute("""SELECT
                     url_checks.url_id,
                     url_checks.created_at,
@@ -113,7 +113,7 @@ def get_url_check(conn: psycopg2.extensions.connection) -> list:
         url_checks = cur.fetchall()
 
     res = []
-    for id, name in table_urls:
+    for id, name in urls:
         for url_id, created_at, status_code in url_checks:
             if id == url_id:
                 res.append({'id': id,
