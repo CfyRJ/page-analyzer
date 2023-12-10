@@ -102,14 +102,12 @@ def get_url_check(conn: psycopg2.extensions.connection) -> list:
         cur.execute("""SELECT id, name FROM urls ORDER BY id DESC;""")
         urls = cur.fetchall()
         cur.execute("""SELECT
-                    url_checks.url_id,
-                    url_checks.created_at,
-                    status_code
-                       FROM url_checks JOIN (
-                           SELECT url_id, MAX(created_at) AS created_at
-                           FROM url_checks GROUP BY url_id) AS tab
-                       ON url_checks.url_id=tab.url_id
-                       AND url_checks.created_at=tab.created_at;""")
+                        DISTINCT ON (url_id)
+                        url_id,
+                        created_at,
+                        status_code
+                    FROM url_checks 
+                    ORDER BY url_id ASC, created_at DESC;""")
         url_checks = cur.fetchall()
 
     res = []
