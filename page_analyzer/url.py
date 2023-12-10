@@ -1,5 +1,6 @@
 import requests
 import validators
+from urllib.parse import urlparse
 
 
 def get_response(url: str) -> (None, requests.models.Response):
@@ -26,3 +27,8 @@ def validate_url(url: str) -> list:
         errors.append('Длина URl превышает 255 символов')
 
     return errors
+
+
+def normalize_url(url: str) -> str:
+    url = urlparse(url)
+    return f'{url.scheme}://{url.netloc}'

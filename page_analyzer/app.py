@@ -6,13 +6,11 @@ from flask import redirect, request
 from flask import url_for
 from flask import flash, get_flashed_messages
 
-import validators
-from urllib.parse import urlparse
-
 from dotenv import load_dotenv
 
 from page_analyzer import db
-from page_analyzer.url import get_response, validate_url
+from page_analyzer import url as _url
+# from page_analyzer.url import get_response, validate_url
 from page_analyzer.html import get_check_result
 
 
@@ -35,7 +33,7 @@ def index():
 @app.post('/urls')
 def add_url():
     url = request.form.get('url')
-    errors = validate_url(url)
+    errors = _url.validate_url(url)
 
     if errors:
 
@@ -50,8 +48,7 @@ def add_url():
             messages=messages,
         ), 422
 
-    url = urlparse(url)
-    url = f'{url.scheme}://{url.netloc}'
+    url = _url.normalize_url(url)
 
     conn = db.create_connection(DATABASE_URL)
     if db.get_url_by_name(url, conn):
@@ -99,7 +96,7 @@ def show_url(id):
 def checks(id):
     url = request.form.to_dict()
 
-    response = get_response(url['name'])
+    response = _url.get_response(url['name'])
     if not response:
         flash('Произошла ошибка при проверке', 'error')
         return redirect(url_for('show_url', id=id), 302)
