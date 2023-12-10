@@ -53,7 +53,7 @@ def add_url():
     url = db.get_url_by_name(conn, url_input)
     if url:
         flash('Страница уже существует', 'info')
-        id = url['id']
+        id = url.id
     else:
         id, message = db.add_url(conn, url_input)
         flash(*message)

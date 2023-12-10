@@ -29,7 +29,7 @@ def add_url(conn: psycopg2.extensions.connection, url: str) -> int:
 
 
 def get_url_by_name(conn: psycopg2.extensions.connection, url: str) -> dict:
-    with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+    with conn.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor) as cur:
 
         cur.execute("""
             SELECT * FROM urls
@@ -42,7 +42,7 @@ def get_url_by_name(conn: psycopg2.extensions.connection, url: str) -> dict:
 
 
 def get_url(conn: psycopg2.extensions.connection, id: int) -> dict:
-    with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+    with conn.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor) as cur:
 
         cur.execute("""
             SELECT * FROM urls
@@ -83,7 +83,7 @@ def add_url_check(conn: psycopg2.extensions.connection,
 
 
 def get_checks_url(conn: psycopg2.extensions.connection, url_id: int) -> list:
-    with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+    with conn.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor) as cur:
 
         cur.execute("""SELECT * FROM url_checks
                     WHERE url_id = %s
