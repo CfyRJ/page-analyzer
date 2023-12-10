@@ -53,7 +53,7 @@ def add_url():
     if db.get_url_by_name(url, conn):
         flash('Страница уже существует', 'info')
     else:
-        message = db.add_urls(url, conn)
+        message = db.add_url(url, conn)
         flash(*message)
 
     url = db.get_url_by_name(url, conn)
@@ -111,7 +111,7 @@ def checks(id):
     flash('Страница успешно проверена', 'success')
 
     conn = db.create_connection(DATABASE_URL)
-    db.add_url_checks(check_data, conn)
+    db.add_url_check(check_data, conn)
     db.close(conn)
 
     return redirect(url_for('show_url', id=id), 302)

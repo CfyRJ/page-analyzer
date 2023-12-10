@@ -10,7 +10,7 @@ def close(conn: psycopg2.extensions.connection) -> None:
     conn.close()
 
 
-def add_urls(url: str, conn: psycopg2.extensions.connection) -> bool:
+def add_url(url: str, conn: psycopg2.extensions.connection) -> bool:
     with conn.cursor() as cur:
 
         try:
@@ -53,7 +53,7 @@ def get_url(id: int, conn: psycopg2.extensions.connection) -> dict:
     return url
 
 
-def add_url_checks(check_date: dict,
+def add_url_check(check_date: dict,
                    conn: psycopg2.extensions.connection) -> bool:
     with conn.cursor() as cur:
 
