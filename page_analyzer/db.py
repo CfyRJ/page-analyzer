@@ -16,9 +16,9 @@ def add_urls(url: str, conn: psycopg2.extensions.connection) -> bool:
                 """,
                         (url,))
             conn.commit()
-            res = True
+            res = ('Страница успешно добавлена', 'success')
         except psycopg2.Error:
-            res = False
+            res = ('При добавлении страницы произошла ошибка', 'error')
 
     return res
 

@@ -54,8 +54,8 @@ def add_url():
     if db.get_url_by_name(url, conn):
         flash('Страница уже существует', 'info')
     else:
-        flash('Страница успешно добавлена', 'success')
-        db.add_urls(url, conn)
+        message = db.add_urls(url, conn)
+        flash(*message)
 
     id = db.get_url_by_name(url, conn)
     conn.close()
