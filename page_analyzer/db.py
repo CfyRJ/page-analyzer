@@ -55,7 +55,7 @@ def get_url(conn: psycopg2.extensions.connection, id: int) -> dict:
 
 
 def add_url_check(conn: psycopg2.extensions.connection,
-                   check_date: dict) -> bool:
+                  check_date: dict) -> bool:
     with conn.cursor() as cur:
 
         try:
@@ -106,7 +106,7 @@ def get_url_check(conn: psycopg2.extensions.connection) -> list:
                         url_id,
                         created_at,
                         status_code
-                    FROM url_checks 
+                    FROM url_checks
                     ORDER BY url_id ASC, created_at DESC;""")
         url_checks = cur.fetchall()
 
