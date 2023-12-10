@@ -10,21 +10,21 @@ def close(conn: psycopg2.extensions.connection) -> None:
     conn.close()
 
 
-def add_url(url: str, conn: psycopg2.extensions.connection) -> bool:
+def add_url(url: str, conn: psycopg2.extensions.connection) -> int:
     with conn.cursor() as cur:
 
         try:
             cur.execute("""
                 INSERT INTO urls (name)
-                VALUES (%s);
+                VALUES (%s) RETURNING id;
                 """,
                         (url,))
             conn.commit()
-            res = ('Страница успешно добавлена', 'success')
+            id = cur.fetchone()[0]
         except psycopg2.Error:
-            res = ('При добавлении страницы произошла ошибка', 'error')
+            raise psycopg2.Error('An error occurred while adding the page')
 
-    return res
+    return id
 
 
 def get_url_by_name(url: str, conn: psycopg2.extensions.connection) -> dict:

@@ -47,19 +47,20 @@ def add_url():
             messages=messages,
         ), 422
 
-    url = _url.normalize_url(url)
+    url_input = _url.normalize_url(url)
 
     conn = db.create_connection(DATABASE_URL)
-    if db.get_url_by_name(url, conn):
+    url = db.get_url_by_name(url_input, conn)
+    if url:
         flash('Страница уже существует', 'info')
+        id = url['id']
     else:
-        message = db.add_url(url, conn)
-        flash(*message)
+        id = db.add_url(url_input, conn)
+        flash('Страница успешно добавлена', 'success')
 
-    url = db.get_url_by_name(url, conn)
     db.close(conn)
 
-    return redirect(url_for('show_url', id=url['id']), 302)
+    return redirect(url_for('show_url', id=id), 302)
 
 
 @app.get('/urls')
