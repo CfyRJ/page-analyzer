@@ -21,10 +21,11 @@ def add_url(url: str, conn: psycopg2.extensions.connection) -> int:
                         (url,))
             conn.commit()
             id = cur.fetchone()[0]
+            message = ('Страница успешно добавлена', 'success')
         except psycopg2.Error:
-            raise psycopg2.Error('An error occurred while adding the page')
+            message = ('Произошла ошибка при добавлении страницы', 'error')
 
-    return id
+    return id, message
 
 
 def get_url_by_name(url: str, conn: psycopg2.extensions.connection) -> dict:
