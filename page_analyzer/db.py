@@ -23,17 +23,17 @@ def add_urls(url: str, conn: psycopg2.extensions.connection) -> bool:
     return res
 
 
-def get_url_by_name(url: str, conn: psycopg2.extensions.connection) -> int:
-    with conn.cursor() as cur:
+def get_url_by_name(url: str, conn: psycopg2.extensions.connection) -> dict:
+    with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
 
         cur.execute("""
-            SELECT id FROM urls
+            SELECT * FROM urls
             WHERE name = %s;
             """,
                     (url, ))
-        id = cur.fetchone()
+        url = cur.fetchone()
 
-    return id[0] if id else 0
+    return url
 
 
 def get_url(id: int, conn: psycopg2.extensions.connection) -> dict:

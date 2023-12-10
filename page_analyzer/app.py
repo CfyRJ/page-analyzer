@@ -57,10 +57,10 @@ def add_url():
         message = db.add_urls(url, conn)
         flash(*message)
 
-    id = db.get_url_by_name(url, conn)
+    url = db.get_url_by_name(url, conn)
     conn.close()
 
-    return redirect(url_for('show_url', id=id), 302)
+    return redirect(url_for('show_url', id=url['id']), 302)
 
 
 @app.get('/urls')
