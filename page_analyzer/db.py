@@ -21,11 +21,10 @@ def add_url(conn: psycopg2.extensions.connection, url: str) -> int:
                         (url,))
             conn.commit()
             id = cur.fetchone()[0]
-            message = ('Страница успешно добавлена', 'success')
         except psycopg2.Error:
-            message = ('Произошла ошибка при добавлении страницы', 'error')
+            id = 0
 
-    return id, message
+    return id
 
 
 def get_url_by_name(conn: psycopg2.extensions.connection, url: str) -> dict:
@@ -75,12 +74,9 @@ def add_url_check(conn: psycopg2.extensions.connection,
                          check_date['description'])
                         )
             conn.commit()
-            res = True
+            return None
         except psycopg2.Error:
-            print('Error adding to database "url_checks".')
-            res = False
-
-    return res
+            return 'Error'
 
 
 def get_checks_url(conn: psycopg2.extensions.connection, url_id: int) -> list:

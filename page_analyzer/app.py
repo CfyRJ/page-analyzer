@@ -5,6 +5,7 @@ from flask import render_template
 from flask import redirect, request
 from flask import url_for
 from flask import flash, get_flashed_messages
+from flask import abort
 
 from dotenv import load_dotenv
 
@@ -16,7 +17,6 @@ from page_analyzer.html import get_check_result
 app = Flask(__name__)
 
 load_dotenv()
-# DATABASE_URL = os.getenv('DATABASE_URL')
 app.config['DATABASE_URL'] = os.getenv('DATABASE_URL')
 app.secret_key = os.getenv('SECRET_KEY')
 
@@ -37,10 +37,11 @@ def add_url():
 
     if errors:
 
-        for i in errors:
-            flash(i, 'error')
+        for error in errors:
+            flash(error, 'error')
 
         messages = get_flashed_messages(with_categories=True)
+        app.logger.info('%s URL validation error.', url, exc_info=True)
 
         return render_template(
             'index.html',
@@ -56,8 +57,16 @@ def add_url():
         flash('Страница уже существует', 'info')
         id = url.id
     else:
-        id, message = db.add_url(conn, url_input)
-        flash(*message)
+        id = db.add_url(conn, url_input)
+        if id:
+            app.logger.info('%s Writing data to the database was successful.',
+                            url, exc_info=True)
+            flash('Страница успешно добавлена', 'success')
+        else:
+            app.logger.error(
+                '%s An error occurred while adding to the database "urls".',
+                url, exc_info=True)
+            abort(500)
 
     db.close(conn)
 
@@ -99,6 +108,9 @@ def checks(id):
 
     response = _url.get_response(url['name'])
     if not response:
+        app.logger.info(
+            '%s An error occurred while requesting the response URL.',
+            url['name'], exc_info=True)
         flash('Произошла ошибка при проверке', 'error')
         return redirect(url_for('show_url', id=id), 302)
 
@@ -110,12 +122,18 @@ def checks(id):
         'status_code': status_code,
     })
 
+    app.logger.info('%s The response was successfully received.',
+                    url['name'], exc_info=True)
     flash('Страница успешно проверена', 'success')
 
     conn = db.create_connection(app.config)
     flage = db.add_url_check(conn, check_data)
     db.close(conn)
 
-    redirect_code = 302 if flage else 500
+    if flage:
+        app.logger.error(
+            '%s An error occurred while adding to the database "url_checks".',
+            url['name'], exc_info=True)
+        abort(500)
 
-    return redirect(url_for('show_url', id=id), redirect_code)
+    return redirect(url_for('show_url', id=id), 302)
