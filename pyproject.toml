@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "hexlet-code"
-version = "0.1.0"
+version = "0.1.1"
 description = "Page Analyzer is a site that analyzes the security of pages to determine their suitability for SEO, similar to PageSpeed Insights."
 authors = ["Alexandr Kositskiy <koso-96@mail.ru>"]
 readme = "README.md"
