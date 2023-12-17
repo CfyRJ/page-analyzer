@@ -38,7 +38,7 @@ def add_url():
             flash(error, 'error')
 
         messages = get_flashed_messages(with_categories=True)
-        app.logger.info('%s URL validation error.', url)
+        app.logger.info(f'{url} URL validation error.')
 
         return render_template(
             'index.html',
@@ -56,8 +56,9 @@ def add_url():
     else:
         id = db.add_url(conn, normalize_url)
         if id:
-            app.logger.info('%s Writing data to the database was successful.',
-                            url)
+            app.logger.info(
+                f'{url} Writing data to the database was successful.',
+            )
             flash('Страница успешно добавлена', 'success')
         else:
             abort(500)
@@ -103,9 +104,11 @@ def checks(id):
     response = _url.get_response(url['name'])
     if not response:
         app.logger.info(
-            '%s An error occurred while requesting the response URL.',
-            url['name'])
+            f"""{url["name"]} An error occurred
+            while requesting the response URL.""")
+
         flash('Произошла ошибка при проверке', 'error')
+
         return redirect(url_for('show_url', id=id), 302)
 
     status_code = response.status_code
@@ -116,8 +119,7 @@ def checks(id):
         'status_code': status_code,
     })
 
-    app.logger.info('%s The response was successfully received.',
-                    url['name'])
+    app.logger.info(f'{url["name"]} The response was successfully received.')
     flash('Страница успешно проверена', 'success')
 
     conn = db.create_connection(app.config)
