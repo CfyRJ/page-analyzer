@@ -102,7 +102,7 @@ def checks(id):
     conn = db.create_connection(app.config)
     url = db.get_url(conn, id)
 
-    response = _url.get_response(url.name)
+    response = html.get_response(url.name)
     if not response:
         app.logger.info(
             f"""{url.name} An error occurred

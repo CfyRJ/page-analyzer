@@ -1,4 +1,5 @@
 from bs4 import BeautifulSoup
+import requests
 
 
 def get_check_result(response) -> dict:
@@ -16,3 +17,16 @@ def get_check_result(response) -> dict:
             'title': title,
             'description': description
             }
+
+
+def get_response(url: str) -> (None, requests.models.Response):
+    try:
+        response = requests.get(url, timeout=1)
+    except (requests.exceptions.RequestException,
+            requests.exceptions.Timeout):
+        return None
+
+    if response and response.status_code == 200:
+        return response
+
+    return None
