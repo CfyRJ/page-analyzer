@@ -78,12 +78,12 @@ def add_url_check(conn: psycopg2.extensions.connection,
                          check_date['description'])
                         )
             conn.commit()
-            return None
+
         except psycopg2.Error:
             logging.error(
                 "An error occurred while adding to the database 'url_checks'.",
                 exc_info=True)
-            return 'Error'
+            raise psycopg2.Error('Error "url_checks"')
 
 
 def get_checks_url(conn: psycopg2.extensions.connection, url_id: int) -> object:

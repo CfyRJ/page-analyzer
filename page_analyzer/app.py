@@ -123,11 +123,12 @@ def checks(id):
     app.logger.info(f'{url.name} The response was successfully received.')
     flash('Страница успешно проверена', 'success')
 
-    flage = db.add_url_check(conn, check_data)
-    db.close(conn)
-
-    if flage:
+    try:
+        db.add_url_check(conn, check_data)
+    except Exception:
         abort(500)
+    finally:
+        db.close(conn)
 
     return redirect(url_for('show_url', id=id), 302)
 
