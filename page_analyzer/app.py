@@ -1,11 +1,8 @@
 import os
 
-from flask import Flask
-from flask import render_template
-from flask import redirect, request
-from flask import url_for
-from flask import flash, get_flashed_messages
-from flask import abort
+from flask import Flask, render_template, \
+    redirect, request, url_for, \
+    flash, get_flashed_messages, abort
 
 from dotenv import load_dotenv
 
