@@ -99,12 +99,13 @@ def show_url(id):
 
 @app.route('/urls/<id>/checks', methods=['post'])
 def checks(id):
-    url = request.form.to_dict()
+    conn = db.create_connection(app.config)
+    url = db.get_url(conn, id)
 
-    response = _url.get_response(url['name'])
+    response = _url.get_response(url.name)
     if not response:
         app.logger.info(
-            f"""{url["name"]} An error occurred
+            f"""{url.name} An error occurred
             while requesting the response URL.""")
 
         flash('Произошла ошибка при проверке', 'error')
@@ -115,14 +116,13 @@ def checks(id):
 
     check_data = html.get_check_result(response)
     check_data.update({
-        'url_id': url['id'],
+        'url_id': id,
         'status_code': status_code,
     })
 
-    app.logger.info(f'{url["name"]} The response was successfully received.')
+    app.logger.info(f'{url.name} The response was successfully received.')
     flash('Страница успешно проверена', 'success')
 
-    conn = db.create_connection(app.config)
     flage = db.add_url_check(conn, check_data)
     db.close(conn)
 

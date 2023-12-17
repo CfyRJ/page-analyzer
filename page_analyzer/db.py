@@ -40,7 +40,6 @@ def get_url_by_name(conn: psycopg2.extensions.connection, url: str) -> object:
             """,
                     (url, ))
         url = cur.fetchone()
-        print(type(url))
 
     return url
 
