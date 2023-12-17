@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 from page_analyzer import db
 from page_analyzer import url as _url
-from page_analyzer.html import get_check_result
+from page_analyzer import html
 
 
 app = Flask(__name__)
@@ -113,7 +113,7 @@ def checks(id):
 
     status_code = response.status_code
 
-    check_data = get_check_result(response)
+    check_data = html.get_check_result(response)
     check_data.update({
         'url_id': url['id'],
         'status_code': status_code,
