@@ -130,3 +130,13 @@ def checks(id):
         abort(500)
 
     return redirect(url_for('show_url', id=id), 302)
+
+
+@app.errorhandler(500)
+def page_500(error):
+    app.logger.info('An error 500 occurred.')
+    return """<h1>Internal Server Error</h1>
+    <p>The server encountered an internal error and was unable
+    to complete your request. Either the server is overloaded or
+    there is an error in the application.</p>
+    """
