@@ -1,5 +1,6 @@
 import psycopg2
 import psycopg2.extras
+import logging
 
 
 def create_connection(config: dict) -> psycopg2.extensions.connection:
@@ -22,6 +23,9 @@ def add_url(conn: psycopg2.extensions.connection, url: str) -> int:
             conn.commit()
             id = cur.fetchone()[0]
         except psycopg2.Error:
+            logging.error(
+                "An error occurred while adding to the database 'urls'.",
+                exc_info=True)
             id = 0
 
     return id
@@ -77,6 +81,9 @@ def add_url_check(conn: psycopg2.extensions.connection,
             conn.commit()
             return None
         except psycopg2.Error:
+            logging.error(
+                "An error occurred while adding to the database 'url_checks'.",
+                exc_info=True)
             return 'Error'
 
 
