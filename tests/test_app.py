@@ -129,15 +129,15 @@ def test_order_urls(client: FlaskClient):
     truncate_table_urls()
 
 
-# def test_url_check_fail(client: FlaskClient):
-#     client.post('/urls', data={
-#         "url": "https://dfgh.ru"
-#     })
+def test_url_check_fail(client: FlaskClient):
+    client.post('/urls', data={
+        "url": "https://dfgh.ru"
+    })
 
-#     response = client.post('/urls/1/checks',
-#                            follow_redirects=True)
+    response = client.post('/urls/1/checks',
+                           follow_redirects=True)
 
-#     assert bytes('Произошла ошибка при проверке',
-#                  encoding='utf-8') in response.data
+    assert bytes('Произошла ошибка при проверке',
+                 encoding='utf-8') in response.data
 
-#     truncate_table_urls()
+    truncate_table_urls()

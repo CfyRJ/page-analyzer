@@ -61,6 +61,7 @@ def add_url():
             )
             flash('Страница успешно добавлена', 'success')
         else:
+            db.close(conn)
             abort(500)
 
     db.close(conn)
@@ -110,6 +111,8 @@ def checks(id):
 
         flash('Произошла ошибка при проверке', 'error')
 
+        db.close(conn)
+
         return redirect(url_for('show_url', id=id), 302)
 
     status_code = response.status_code
@@ -134,10 +137,9 @@ def checks(id):
 
 
 @app.errorhandler(500)
-def page_500(error):
+def page_500(errors):
     app.logger.info('An error 500 occurred.')
-    return """<h1>Internal Server Error</h1>
-    <p>The server encountered an internal error and was unable
-    to complete your request. Either the server is overloaded or
-    there is an error in the application.</p>
-    """
+    return render_template(
+        '500.html',
+        errors=errors
+    ), 500
