@@ -140,6 +140,6 @@ def checks(id):
 def page_500(errors):
     app.logger.info('An error 500 occurred.')
     return render_template(
-        '500.html',
+        'errors/500.html',
         errors=errors
     ), 500
